@@ -56,9 +56,10 @@ mkdir -p ${OUTPUT_DIR}/Models/
 CLIENT_LANGUAGE=csharp; CLEANUP_DIRS=(docs src target gradle); kubeclient::generator::generate_client "${OUTPUT_DIR}"
 
 # hack for generating empty host url
-sed -i '/BaseUri = new System.Uri(\"\");/ d' ${OUTPUT_DIR}/Kubernetes.cs
+sed -i '/BaseUri = new System.Uri(\"\");/ d' ${OUTPUT_DIR}/Voyager.cs
 
-# remove public prop from Quantity, (autorest cannot generate empty class)
-sed -i '/JsonProperty/ d' ${OUTPUT_DIR}/Models/ResourceQuantity.cs
-sed -i 's/public string Value/private string Value/' ${OUTPUT_DIR}/Models/ResourceQuantity.cs
-sed -i 's/; set/; private set/' ${OUTPUT_DIR}/Models/V1Patch.cs
+grep -rl ${OUTPUT_DIR} -e 'Iok8sapi' | xargs sed -i '1 i\using k8s.Models;\n'
+find ${OUTPUT_DIR} -type f -name "*.cs" -exec sed -i 's/Iok8sapimachinerypkgapismetav1Patch/k8s.Models.V1Patch/g' {} +
+find ${OUTPUT_DIR} -type f -name "*.cs" -exec sed -i 's/Iok8sapimachinerypkgapismetav1/k8s.Models.V1/g' {} +
+find ${OUTPUT_DIR} -type f -name "*.cs" -exec sed -i 's/Iok8sapimachinerypkgutilintstrIntOrString/k8s.Models.IntstrIntOrString/g' {} +
+find ${OUTPUT_DIR} -type f -name "*.cs" -exec sed -i 's/Iok8sapicorev1/k8s.Models.V1/g' {} +

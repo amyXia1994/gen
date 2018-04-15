@@ -132,6 +132,8 @@ def process_swagger(spec, client_language):
 
     if client_language == "java":
         remove_kubernetes_models(spec)
+    if client_language == "csharp":
+        mark_kubernetes_models_as_external(spec)
 
     return spec
 
@@ -139,7 +141,7 @@ def preserved_primitives_for_language(client_language):
     if client_language == "java":
         return ["io.k8s.apimachinery.pkg.util.intstr.IntOrString", "io.k8s.apimachinery.pkg.api.resource.Quantity"]
     elif client_language == "csharp":
-        return ["intstr.IntOrString", "resource.Quantity", "v1.Patch"]
+        return ["io.k8s.apimachinery.pkg.util.intstr.IntOrString", "io.k8s.apimachinery.pkg.api.resource.Quantity", "io.k8s.apimachinery.pkg.apis.meta.v1.Patch"]
     else:
         return []
 
@@ -199,10 +201,8 @@ def remove_deprecated_models(spec):
 
 def remove_kubernetes_models(spec):
     """
-    In kubernetes 1.8 some of the models are renamed. Our remove_model_prefixes
-    still creates the same model names but there are some models added to
-    reference old model names to new names. These models broke remove_model_prefixes
-    and need to be removed.
+    Skip generating models for Kubernetes apimachinery and core api objects.
+    ref: https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-external
     """
     models = {}
     for k, v in spec['definitions'].items():
@@ -211,6 +211,19 @@ def remove_kubernetes_models(spec):
             rename_model(spec, k, new_name)
         else:
             models[k] = v
+    spec['definitions'] = models
+
+
+def mark_kubernetes_models_as_external(spec):
+    """
+    Skip generating model classes for Kubernetes apimachinery and core api objects.
+    ref: https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-external
+    """
+    models = {}
+    for k, v in spec['definitions'].items():
+        if k.startswith("io.k8s"):
+            v['x-ms-external'] = True
+        models[k] = v
     spec['definitions'] = models
 
 
