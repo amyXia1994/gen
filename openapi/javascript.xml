@@ -19,10 +19,10 @@
                         <configuration>
                             <inputSpec>${generator.spec.path}</inputSpec>
                             <language>javascript</language>
-                            <gitUserId>kubernetes-incubator</gitUserId>
-                            <gitRepoId>client-javascript</gitRepoId>
+                            <gitUserId>voyager-client</gitUserId>
+                            <gitRepoId>javascript</gitRepoId>
                             <configOptions>
-                                <projectName>kubernetes-js-client</projectName>
+                                <projectName>voyager-js-client</projectName>
                                 <projectDescription>Javascript client for Kubernetes.</projectDescription>
                                 <projectVersion>${generator.client.version}</projectVersion>
                                 <projectLicenseName>Apache V2</projectLicenseName>
